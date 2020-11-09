@@ -120,10 +120,12 @@ class HomePageViewController: UIViewController {
         //Alert popup for textview input
         let ac = UIAlertController(title: "New Task", message: nil, preferredStyle: .alert)
         ac.addTextField()
-
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
         let submitAction = UIAlertAction(title: "Add", style: .default) { [unowned ac] _ in
             let field = ac.textFields![0]
-            self.viewModel.addNewTask(field.text ?? "") { [weak self] (task) in
+            guard let input = field.text else {return}
+            self.viewModel.addNewTask(input) { [weak self] (task) in
                 guard let self = self else {return}
                 DispatchQueue.main.async {
                     self.localTasks.append(task)
@@ -132,7 +134,7 @@ class HomePageViewController: UIViewController {
             }
             // do something interesting with "answer" here
         }
-
+        ac.addAction(cancelAction)
         ac.addAction(submitAction)
 
         present(ac, animated: true)
@@ -171,7 +173,6 @@ extension HomePageViewController : UITableViewDelegate, UITableViewDataSource {
         
         let vc = TaskDetailsViewController()
         let task = filteredTasks[indexPath.row]
-        
         vc.task = task
         
         self.navigationController?.pushViewController(vc, animated: true)

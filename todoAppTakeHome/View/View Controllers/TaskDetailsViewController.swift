@@ -20,14 +20,7 @@ class TaskDetailsViewController: UIViewController, UINavigationControllerDelegat
     let viewModel = TaskDetailsViewModel()
     var imagePicker = UIImagePickerController()
     var completeLabel = String()
-    var task : NSManagedObject?{
-        didSet{
-            taskTextView.text = task?.value(forKey: "title") as? String
-            let imgData = task?.value(forKey: "image") as? Data
-            guard let img = imgData else {return}
-            taskImageView.image = UIImage(data: img)
-        }
-    }
+    var task = NSManagedObject()
     
     //MARK:- Lifecycle Methods
     override func loadView() {
@@ -43,12 +36,20 @@ class TaskDetailsViewController: UIViewController, UINavigationControllerDelegat
     override func viewDidLoad() {
         super.viewDidLoad()
         self.hideKeyboardWhenTappedAround()
+        settingProperties()
     }
     
+    private func settingProperties(){
+        taskTextView.text = task.value(forKey: "title") as? String
+        let imgData = task.value(forKey: "image") as? Data
+        guard let img = imgData else {return}
+        taskImageView.image = UIImage(data: img)
+    }
     //MARK:- UI Layout Configurations
+
     
     private func configureNavButtons(){
-        let isComplete = task?.value(forKey: "completed") as? Bool
+        let isComplete = task.value(forKey: "completed") as? Bool
         if(isComplete ?? false){
             completeLabel = "Mark Incomplete"
         }else{
@@ -123,13 +124,11 @@ class TaskDetailsViewController: UIViewController, UINavigationControllerDelegat
     
     //saves text to core data
     private func saveClicked() {
-        guard let task = task else {return}
         viewModel.updateTitleEntry(task, taskTextView.text)
         navigationController?.popToRootViewController(animated: true)
     }
     //deletes obj from core data
     private func deleteClicked() {
-        guard let task = task else {return}
         
         let alert = UIAlertController(title: "Delete?", message: "", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .default))
@@ -140,7 +139,7 @@ class TaskDetailsViewController: UIViewController, UINavigationControllerDelegat
             case .cancel:
                 print("cancel")
             case .destructive:
-                self.viewModel.deleteTask(task) { [weak self] (deleted) in
+                self.viewModel.deleteTask(self.task) { [weak self] (deleted) in
                     guard let self = self else {return}
                     if(deleted == true){
                         self.navigationController?.popToRootViewController(animated: true)
@@ -154,9 +153,8 @@ class TaskDetailsViewController: UIViewController, UINavigationControllerDelegat
     
     //updates complete to core data
     private func completeClicked(){
-        var isComplete = task?.value(forKey: "completed") as? Bool
+        var isComplete = task.value(forKey: "completed") as? Bool
         guard let complete = isComplete else {return}
-        guard let task = task else {return}
         viewModel.markComplete(task, complete)
         if(complete){
             completeLabel = "Mark Incomplete"
@@ -189,7 +187,7 @@ class TaskDetailsViewController: UIViewController, UINavigationControllerDelegat
         }
         //setting new image
         let data = image.pngData()
-        guard let imgData = data, let task = task else {return}
+        guard let imgData = data else {return}
         viewModel.saveImage(task, imgData)
         taskImageView.image = image
     }
