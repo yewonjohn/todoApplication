@@ -8,19 +8,24 @@
 import UIKit
 import CoreData
 
-class TaskDetailsViewController: UIViewController{
+class TaskDetailsViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate{
     //MARK:- UI Properties
-    var backgroundView = UIImageView()
+    private var backgroundView = UIImageView()
+    var taskImageView = UIImageView()
     var taskTitleLabel = UILabel()
     var taskTextView = UITextView()
     
     
     //MARK:- Properties
     let viewModel = TaskDetailsViewModel()
+    var imagePicker = UIImagePickerController()
     var completeLabel = String()
     var task : NSManagedObject?{
         didSet{
             taskTextView.text = task?.value(forKey: "title") as? String
+            let imgData = task?.value(forKey: "image") as? Data
+            guard let img = imgData else {return}
+            taskImageView.image = UIImage(data: img)
         }
     }
     
@@ -30,6 +35,7 @@ class TaskDetailsViewController: UIViewController{
         
         setBackground(view, backgroundView)
         configureLabel()
+        configureImageView()
         configureTextView()
         configureNavButtons()
     }
@@ -42,7 +48,7 @@ class TaskDetailsViewController: UIViewController{
     //MARK:- UI Layout Configurations
     
     private func configureNavButtons(){
-        var isComplete = task?.value(forKey: "completed") as? Bool
+        let isComplete = task?.value(forKey: "completed") as? Bool
         if(isComplete ?? false){
             completeLabel = "Mark Incomplete"
         }else{
@@ -77,18 +83,39 @@ class TaskDetailsViewController: UIViewController{
         taskTitleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     }
     
+    private func configureImageView(){
+        view.addSubview(taskImageView)
+        taskImageView.layer.cornerRadius = 15
+        taskImageView.clipsToBounds = true
+        taskImageView.contentMode = .scaleAspectFill
+        taskImageView.backgroundColor = .textfieldColor	
+
+        //set up tap gesture for imageview
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(imageTapped(tapGestureRecognizer:)))
+        taskImageView.isUserInteractionEnabled = true
+        taskImageView.addGestureRecognizer(tapGestureRecognizer)
+
+        taskImageView.translatesAutoresizingMaskIntoConstraints = false
+        taskImageView.topAnchor.constraint(equalTo: taskTitleLabel.bottomAnchor, constant: view.frame.height * 0.02).isActive = true
+        taskImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        
+        taskImageView.widthAnchor.constraint(equalToConstant: view.frame.height * 0.1).isActive = true
+        taskImageView.heightAnchor.constraint(equalToConstant: view.frame.height * 0.1).isActive = true
+
+    }
+    
     private func configureTextView(){
         view.addSubview(taskTextView)
-        taskTextView.backgroundColor = .mainColor
+        taskTextView.backgroundColor = .textfieldColor
         taskTextView.font = .taskTextView
         taskTextView.textColor = .textColor
         taskTextView.layer.cornerRadius = 15
         taskTextView.contentInset = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
         
         taskTextView.translatesAutoresizingMaskIntoConstraints = false
-        taskTextView.topAnchor.constraint(equalTo: taskTitleLabel.bottomAnchor, constant: view.frame.height * 0.05).isActive = true
-        taskTextView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10).isActive = true
-        taskTextView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -5).isActive = true
+        taskTextView.topAnchor.constraint(equalTo: taskImageView.bottomAnchor, constant: view.frame.height * 0.02).isActive = true
+        taskTextView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: view.frame.height * 0.02).isActive = true
+        taskTextView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -view.frame.height * 0.02).isActive = true
         taskTextView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -view.frame.height * 0.1).isActive = true
     }
 
@@ -139,5 +166,31 @@ class TaskDetailsViewController: UIViewController{
         self.navigationController?.popToRootViewController(animated: true)
     }
     
+    @objc func imageTapped(tapGestureRecognizer: UITapGestureRecognizer)
+    {
+        //presenting image picker
+        if UIImagePickerController.isSourceTypeAvailable(.savedPhotosAlbum){
+            imagePicker.delegate = self
+            imagePicker.sourceType = .savedPhotosAlbum
+            imagePicker.allowsEditing = false
+            present(imagePicker, animated: true, completion: nil)
+        }
+    }
     
+    //MARK:- UIImagePicker Delegates
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
+    }
+
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true, completion: nil)
+        guard let image = info[.originalImage] as? UIImage else {
+            fatalError("Expected a dictionary containing an image, but was provided the following: \(info)")
+        }
+        //setting new image
+        let data = image.pngData()
+        guard let imgData = data, let task = task else {return}
+        viewModel.saveImage(task, imgData)
+        taskImageView.image = image
+    }
 }

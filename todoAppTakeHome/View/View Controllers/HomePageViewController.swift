@@ -21,7 +21,6 @@ class HomePageViewController: UIViewController {
     override var preferredStatusBarStyle: UIStatusBarStyle {return .lightContent}
     private var localTasks : [NSManagedObject] = []{
         didSet{
-            print("triggered")
             filteredTasks = localTasks
         }
     }

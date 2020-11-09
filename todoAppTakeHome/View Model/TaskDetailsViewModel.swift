@@ -35,8 +35,8 @@ class TaskDetailsViewModel{
         managedContext.delete(task)
         do {
             try managedContext.save()
-                completion(true)
-                print("deleted")
+            completion(true)
+            print("deleted")
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
@@ -53,6 +53,20 @@ class TaskDetailsViewModel{
         }catch let error as NSError{
             print("Could not update ")
         }
-
     }
+    
+    func saveImage(_ task: NSManagedObject,_ data: Data) {
+        guard let appDelegate = appDelegate else { return }
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        do {
+            task.setValue(data, forKey: "image")
+
+            try managedContext.save()
+            print("Image is saved")
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
 }

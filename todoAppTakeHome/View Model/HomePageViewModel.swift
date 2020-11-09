@@ -82,6 +82,7 @@ class HomePageViewModel {
         }else{
             fetchTasksLocal(){ (result) in
                 completion(result)
+                
             }
         }
     }
@@ -97,6 +98,7 @@ class HomePageViewModel {
         do {
             resultTasks = try managedContext.fetch(fetchRequest)
             completion(resultTasks)
+
         } catch let error as NSError {
             print("Could not fetch. \(error), \(error.userInfo)")
         }
