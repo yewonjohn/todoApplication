@@ -21,9 +21,4 @@ class CheckBoxButton: UIButton {
             }
         }
     }
-    //MARK:- Lifecycle Methods
-    override func awakeFromNib() {
-
-    }
-
 }
