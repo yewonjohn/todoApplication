@@ -45,9 +45,8 @@ class TaskDetailsViewController: UIViewController, UINavigationControllerDelegat
         guard let img = imgData else {return}
         taskImageView.image = UIImage(data: img)
     }
-    //MARK:- UI Layout Configurations
-
     
+    //MARK:- UI Layout Configurations
     private func configureNavButtons(){
         let isComplete = task.value(forKey: "completed") as? Bool
         if(isComplete ?? false){
@@ -59,18 +58,18 @@ class TaskDetailsViewController: UIViewController, UINavigationControllerDelegat
         let saveMenu = UIMenu(title: "", children: [
             UIAction(title: "Save", image: UIImage(named: "saveButton")) { action in
                 self.saveClicked()
-                },
-             UIAction(title: "\(completeLabel)", image: UIImage(named: "pencil")) { action in
+            },
+            UIAction(title: "\(completeLabel)", image: UIImage(named: "pencil")) { action in
                 self.completeClicked()
-                },
-             UIAction(title: "Delete", image: UIImage(named: "deleteButton")) { action in
+            },
+            UIAction(title: "Delete", image: UIImage(named: "deleteButton")) { action in
                 self.deleteClicked()
-                },
-              ])
+            },
+        ])
         
         let navItem = UIBarButtonItem(image: UIImage(named: "menu"), menu: saveMenu)
         self.navigationItem.setRightBarButton(navItem, animated: true)
-
+        
     }
     
     private func configureLabel(){
@@ -90,19 +89,19 @@ class TaskDetailsViewController: UIViewController, UINavigationControllerDelegat
         taskImageView.clipsToBounds = true
         taskImageView.contentMode = .scaleAspectFill
         taskImageView.backgroundColor = .textfieldColor	
-
+        
         //set up tap gesture for imageview
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(imageTapped(tapGestureRecognizer:)))
         taskImageView.isUserInteractionEnabled = true
         taskImageView.addGestureRecognizer(tapGestureRecognizer)
-
+        
         taskImageView.translatesAutoresizingMaskIntoConstraints = false
         taskImageView.topAnchor.constraint(equalTo: taskTitleLabel.bottomAnchor, constant: view.frame.height * 0.02).isActive = true
         taskImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         
         taskImageView.widthAnchor.constraint(equalToConstant: view.frame.height * 0.1).isActive = true
         taskImageView.heightAnchor.constraint(equalToConstant: view.frame.height * 0.1).isActive = true
-
+        
     }
     
     private func configureTextView(){
@@ -119,7 +118,7 @@ class TaskDetailsViewController: UIViewController, UINavigationControllerDelegat
         taskTextView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -view.frame.height * 0.02).isActive = true
         taskTextView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -view.frame.height * 0.1).isActive = true
     }
-
+    
     //MARK:- Menu Actions
     
     //saves text to core data
@@ -129,7 +128,6 @@ class TaskDetailsViewController: UIViewController, UINavigationControllerDelegat
     }
     //deletes obj from core data
     private func deleteClicked() {
-        
         let alert = UIAlertController(title: "Delete?", message: "", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .default))
         alert.addAction(UIAlertAction(title: "Yes, delete", style: .destructive, handler: { action in
@@ -147,13 +145,12 @@ class TaskDetailsViewController: UIViewController, UINavigationControllerDelegat
                 }
             }
         }))
-        
         self.present(alert, animated: true, completion: nil)
     }
     
     //updates complete to core data
     private func completeClicked(){
-        var isComplete = task.value(forKey: "completed") as? Bool
+        let isComplete = task.value(forKey: "completed") as? Bool
         guard let complete = isComplete else {return}
         viewModel.markComplete(task, complete)
         if(complete){
@@ -163,7 +160,7 @@ class TaskDetailsViewController: UIViewController, UINavigationControllerDelegat
         }
         self.navigationController?.popToRootViewController(animated: true)
     }
-    
+    //triggers when image is tapped
     @objc func imageTapped(tapGestureRecognizer: UITapGestureRecognizer)
     {
         //presenting image picker
@@ -175,11 +172,11 @@ class TaskDetailsViewController: UIViewController, UINavigationControllerDelegat
         }
     }
     
-    //MARK:- UIImagePicker Delegates
+    //MARK:- UIImagePicker Delegates (image picker popup)
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true, completion: nil)
     }
-
+    
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true, completion: nil)
         guard let image = info[.originalImage] as? UIImage else {

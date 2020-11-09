@@ -13,7 +13,6 @@ class TaskDetailsViewModel{
     private let appDelegate = UIApplication.shared.delegate as? AppDelegate
     
     func updateTitleEntry(_ task: NSManagedObject, _ entry: String){
-        
         //fetching core data context here
         guard let appDelegate = appDelegate else { return }
         let managedContext = appDelegate.persistentContainer.viewContext
@@ -25,7 +24,6 @@ class TaskDetailsViewModel{
         }catch let error as NSError{
             print("Could not update checkbox")
         }
-        
     }
     
     func deleteTask(_ task: NSManagedObject, completion: @escaping ((_ done: Bool) -> Void)){
@@ -58,10 +56,8 @@ class TaskDetailsViewModel{
     func saveImage(_ task: NSManagedObject,_ data: Data) {
         guard let appDelegate = appDelegate else { return }
         let managedContext = appDelegate.persistentContainer.viewContext
-        
         do {
             task.setValue(data, forKey: "image")
-
             try managedContext.save()
             print("Image is saved")
         } catch {

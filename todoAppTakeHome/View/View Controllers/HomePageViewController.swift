@@ -61,7 +61,7 @@ class HomePageViewController: UIViewController {
     //MARK:- UI Layout Configurations
     
     private func configNavBar(){
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "cancel", style: .plain, target: nil, action: nil)
         navigationController?.navigationBar.tintColor = .navBarTint
     }
     
@@ -73,7 +73,6 @@ class HomePageViewController: UIViewController {
         taskTitleLabel.translatesAutoresizingMaskIntoConstraints = false
         taskTitleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
         taskTitleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        
     }
     
     private func configSearchBar(){
@@ -81,7 +80,7 @@ class HomePageViewController: UIViewController {
         taskSearchBar.backgroundColor = .mainColor
         taskSearchBar.barTintColor = .mainColor
         taskSearchBar.tintColor = .textColor
-
+        
         taskSearchBar.delegate = self
         taskSearchBar.translatesAutoresizingMaskIntoConstraints = false
         taskSearchBar.topAnchor.constraint(equalTo: taskTitleLabel.bottomAnchor, constant: 15).isActive = true
@@ -116,7 +115,6 @@ class HomePageViewController: UIViewController {
     }
     //MARK:- Actions
     @objc func addTask(sender: UIButton){
-  
         //Alert popup for textview input
         let ac = UIAlertController(title: "New Task", message: nil, preferredStyle: .alert)
         ac.addTextField()
@@ -132,23 +130,22 @@ class HomePageViewController: UIViewController {
                     self.taskTableView.reloadData()
                 }
             }
-            // do something interesting with "answer" here
         }
         ac.addAction(cancelAction)
         ac.addAction(submitAction)
-
+        
         present(ac, animated: true)
         
         //little bouncy animation
         UIView.animate(withDuration: 0.2,
-            animations: {
-                sender.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
-            },
-            completion: { _ in
-                UIView.animate(withDuration: 0.2) {
-                    sender.transform = CGAffineTransform.identity
-                }
-            })
+                       animations: {
+                        sender.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+                       },
+                       completion: { _ in
+                        UIView.animate(withDuration: 0.2) {
+                            sender.transform = CGAffineTransform.identity
+                        }
+                       })
     }
 }
 //MARK:- Tableview Delegate and Datasource
@@ -176,7 +173,6 @@ extension HomePageViewController : UITableViewDelegate, UITableViewDataSource {
         vc.task = task
         
         self.navigationController?.pushViewController(vc, animated: true)
-        
     }
     //setting cell height
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -188,17 +184,15 @@ extension HomePageViewController : UITableViewDelegate, UITableViewDataSource {
             
             let task = filteredTasks[indexPath.row]
             filteredTasks.remove(at: indexPath.row)
-
-            viewModel.deleteTask(task) { [weak self] (deleted) in
-                guard let self = self else {return}
+            
+            viewModel.deleteTask(task) { (deleted) in
                 if(deleted){
                     DispatchQueue.main.async {
-                        self.taskTableView.reloadData()
+                        tableView.deleteRows(at: [indexPath], with: .left)
                     }
                 }
             }
-            tableView.deleteRows(at: [indexPath], with: .fade)
-
+            
         }
     }
     
@@ -207,27 +201,14 @@ extension HomePageViewController : UITableViewDelegate, UITableViewDataSource {
 //MARK:- Filtering Search Bar (Delegate)
 extension HomePageViewController: UISearchBarDelegate{
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if(searchText == "" || searchText == nil){
+        
+        viewModel.runFilter(searchText: searchText, localTasks: localTasks, filteredTasks: filteredTasks){ [weak self] (filtered) in
+            guard let self = self else {return}
             DispatchQueue.main.async {
-                self.filteredTasks = self.localTasks
-                self.taskTableView.reloadData()
-            }
-        }else{
-            self.filteredTasks = []
-            let filter = searchText.lowercased()
-                for task in localTasks{
-                    let taskTitle = task.value(forKey: "title") as! String
-                    if(taskTitle.contains(filter)){
-                        filteredTasks.append(task)
-                        }
-                }
-            
-            DispatchQueue.main.async {
+                self.filteredTasks = filtered
                 self.taskTableView.reloadSections([0], with: .automatic)
             }
         }
-
-
     }
     //dismisses search bar keyboard
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {

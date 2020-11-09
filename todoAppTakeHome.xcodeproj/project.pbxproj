@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		449245D92558D27500DC79ED /* UserDefaultUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 449245D82558D27500DC79ED /* UserDefaultUtil.swift */; };
 		4496C61B2555E7C00051340C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4496C61A2555E7C00051340C /* AppDelegate.swift */; };
 		4496C61D2555E7C00051340C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4496C61C2555E7C00051340C /* SceneDelegate.swift */; };
 		4496C61F2555E7C00051340C /* HomePageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4496C61E2555E7C00051340C /* HomePageViewController.swift */; };
@@ -50,6 +51,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		449245D82558D27500DC79ED /* UserDefaultUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultUtil.swift; sourceTree = "<group>"; };
 		4496C6172555E7C00051340C /* todoAppTakeHome.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = todoAppTakeHome.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4496C61A2555E7C00051340C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4496C61C2555E7C00051340C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -225,6 +227,7 @@
 				4496C690255609800051340C /* Fonts.swift */,
 				4496C76E25578DF70051340C /* Colors.swift */,
 				4496C74B255653C80051340C /* UIKit + Extensions.swift */,
+				449245D82558D27500DC79ED /* UserDefaultUtil.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -379,6 +382,7 @@
 				4496C73B25562D530051340C /* TaskDetailsViewController.swift in Sources */,
 				4496C61F2555E7C00051340C /* HomePageViewController.swift in Sources */,
 				4496C61B2555E7C00051340C /* AppDelegate.swift in Sources */,
+				449245D92558D27500DC79ED /* UserDefaultUtil.swift in Sources */,
 				4496C61D2555E7C00051340C /* SceneDelegate.swift in Sources */,
 				4496C7412556311C0051340C /* NavigationViewController.swift in Sources */,
 				4496C74C255653C80051340C /* UIKit + Extensions.swift in Sources */,

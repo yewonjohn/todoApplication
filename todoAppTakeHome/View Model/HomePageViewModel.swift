@@ -11,9 +11,8 @@ import CoreData
 class HomePageViewModel {
     
     //MARK:- Properties
-    private let userDefault = UserDefaults.standard
     private let appDelegate = UIApplication.shared.delegate as? AppDelegate
-
+    
     func getTasks(completion: @escaping ((_ tasks: [TaskModel]) -> Void)){
         
         let session = URLSession.shared
@@ -48,7 +47,7 @@ class HomePageViewModel {
         var taskModels = [TaskModel]()
         let operationQueue = OperationQueue()
         //checks if running first time
-        if !userDefault.bool(forKey: "firstTimeRun"){
+        if (!UserDefaultUtil.firstTimeRun){
             //setting up first task (API Call)
             let getTasksNetwork = BlockOperation {
                 let dispatchGroup1 = DispatchGroup()
@@ -67,8 +66,7 @@ class HomePageViewModel {
                 
                 self.saveToCoreData(listOfTasks: taskModels) { (result) in
                     completion(result)
-                    self.userDefault.set(true, forKey: "firstTimeRun")
-                    self.userDefault.synchronize()
+                    UserDefaultUtil.firstTimeRun = true
                     dispatchGroup2.leave()
                 }
                 dispatchGroup2.wait()
@@ -78,7 +76,7 @@ class HomePageViewModel {
             operationQueue.addOperation(getTasksNetwork)
             operationQueue.addOperation(saveTasksLocally)
             
-        //If not first time, fetch data locally
+            //If not first time, fetch data locally
         }else{
             fetchTasksLocal(){ (result) in
                 completion(result)
@@ -98,7 +96,7 @@ class HomePageViewModel {
         do {
             resultTasks = try managedContext.fetch(fetchRequest)
             completion(resultTasks)
-
+            
         } catch let error as NSError {
             print("Could not fetch. \(error), \(error.userInfo)")
         }
@@ -115,7 +113,7 @@ class HomePageViewModel {
         print(Thread.current)
         managedContext.perform {
             print(Thread.current)
-
+            
             for task in listOfTasks{
                 let localTask = NSManagedObject(entity: entity, insertInto: managedContext)
                 
@@ -135,7 +133,7 @@ class HomePageViewModel {
                 }
             }
         }
-
+        
     }
     
     func deleteTask(_ task: NSManagedObject, completion: @escaping ((_ done: Bool) -> Void)){
@@ -145,8 +143,8 @@ class HomePageViewModel {
         managedContext.delete(task)
         do {
             try managedContext.save()
-                completion(true)
-                print("deleted")
+            completion(true)
+            print("deleted")
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
@@ -172,8 +170,26 @@ class HomePageViewModel {
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
-        
     }
+    
+    func runFilter(searchText: String, localTasks: [NSManagedObject], filteredTasks: [NSManagedObject], completion: @escaping ((_ filtered: [NSManagedObject]) -> Void)){
+        var filteredTasks = filteredTasks
+        if(searchText.isEmpty){
+            filteredTasks = localTasks
+            completion(filteredTasks)
+        }else{
+            filteredTasks = []
+            let filter = searchText.lowercased()
+            for task in localTasks{
+                let taskTitle = task.value(forKey: "title") as! String
+                if(taskTitle.contains(filter)){
+                    filteredTasks.append(task)
+                }
+            }
+            completion(filteredTasks)
+        }
+    }
+    
 }
 
 
