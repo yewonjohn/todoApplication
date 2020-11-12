@@ -19,12 +19,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: UIScreen.main.bounds)
         
         if let window = window {
-            //            print("triggering")
             let mainVC = HomePageViewController()
             let navigationController = NavigationViewController(rootViewController: mainVC)
             window.rootViewController = navigationController
             window.makeKeyAndVisible()
-            
         }
         return true
     }

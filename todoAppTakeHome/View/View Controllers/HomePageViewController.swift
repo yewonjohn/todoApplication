@@ -91,7 +91,7 @@ class HomePageViewController: UIViewController {
     private func configTableView(){
         view.addSubview(taskTableView)
         taskTableView.backgroundColor = .mainColor
-        taskTableView.register(TaskCell.self, forCellReuseIdentifier: TaskCell.identifier)
+        taskTableView.register(TaskCell.self, forCellReuseIdentifier: TaskCell.reuseIdentifier())
         taskTableView.delegate = self
         taskTableView.dataSource = self
         taskTableView.translatesAutoresizingMaskIntoConstraints = false
@@ -157,7 +157,7 @@ extension HomePageViewController : UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: TaskCell.identifier, for: indexPath) as! TaskCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: TaskCell.reuseIdentifier(), for: indexPath) as! TaskCell
         let task = filteredTasks[indexPath.row]
         
         cell.taskTitle.text = task.value(forKey: "title") as? String

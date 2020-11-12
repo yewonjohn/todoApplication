@@ -13,6 +13,7 @@ class HomePageViewModel {
     //MARK:- Properties
     private let appDelegate = UIApplication.shared.delegate as? AppDelegate
     
+    //MARK:- Network Methods
     func getTasks(completion: @escaping ((_ tasks: [TaskModel]) -> Void)){
         
         let session = URLSession.shared
@@ -29,8 +30,6 @@ class HomePageViewModel {
             // Serialize the data into an object
             do {
                 let resultTasks = try JSONDecoder().decode([TaskModel].self, from: data!)
-                //try JSONSerialization.jsonObject(with: data!, options: [])
-                
                 completion(resultTasks)
             } catch {
                 print("Error during JSON serialization: \(error.localizedDescription)")
@@ -182,7 +181,8 @@ class HomePageViewModel {
             let filter = searchText.lowercased()
             for task in localTasks{
                 let taskTitle = task.value(forKey: "title") as! String
-                if(taskTitle.contains(filter)){
+                //added lowercased() here..
+                if(taskTitle.lowercased().contains(filter)){
                     filteredTasks.append(task)
                 }
             }
